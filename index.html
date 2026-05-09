@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YT Focus Mode — Take Back Your Attention</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+:root {
+  --red: #ff2d2d;
+  --red-dim: rgba(255,45,45,0.12);
+  --red-glow: rgba(255,45,45,0.25);
+  --bg: #080808;
+  --bg2: #111;
+  --bg3: #181818;
+  --border: rgba(255,255,255,0.07);
+  --text: #f0f0f0;
+  --muted: #666;
+  --paypal: #003087;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NOISE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LAYOUT ── */
+.container { max-width: 900px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 18px 0;
+  background: rgba(8,8,8,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: 900px; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px;
+  text-decoration: none; color: var(--text);
+}
+.nav-logo-icon {
+  width: 30px; height: 30px;
+  background: var(--red);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.nav-logo-icon svg { display: block; }
+.nav-dl {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--red); color: #fff;
+  padding: 8px 18px; border-radius: 6px;
+  font-size: 13px; font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  cursor: pointer; border: none;
+}
+.nav-dl:hover { opacity: 0.85; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  position: relative;
+}
+.hero-glow {
+  position: absolute;
+  top: 20%; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(255,45,45,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--red-dim);
+  border: 1px solid rgba(255,45,45,0.3);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 12px; font-weight: 500; color: var(--red);
+  letter-spacing: 0.05em; text-transform: uppercase;
+  margin-bottom: 28px;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--red); display: inline-block; animation: pulse 2s infinite; }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(42px, 8vw, 78px);
+  font-weight: 800; line-height: 1.0;
+  letter-spacing: -0.03em;
+  margin-bottom: 24px;
+  animation: fadeUp 0.6s ease 0.1s both;
+}
+h1 .accent { color: var(--red); display: block; }
+
+.hero-sub {
+  font-size: clamp(16px, 2.5vw, 19px);
+  color: var(--muted);
+  max-width: 520px;
+  font-weight: 300;
+  margin-bottom: 44px;
+  animation: fadeUp 0.6s ease 0.2s both;
+}
+
+.hero-cta {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+  animation: fadeUp 0.6s ease 0.3s both;
+}
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--red); color: #fff;
+  padding: 14px 32px; border-radius: 8px;
+  font-size: 15px; font-weight: 500;
+  text-decoration: none; border: none; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 0 0 0 var(--red-glow);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--red-glow);
+}
+.btn-primary svg { flex-shrink: 0; }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: var(--muted);
+  padding: 14px 24px; border-radius: 8px;
+  font-size: 15px; text-decoration: none;
+  border: 1px solid var(--border);
+  transition: color 0.15s, border-color 0.15s;
+}
+.btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+.hero-note { margin-top: 18px; font-size: 12px; color: #333; animation: fadeUp 0.6s ease 0.4s both; }
+
+/* ── DIVIDER ── */
+.section-divider {
+  height: 1px; background: var(--border); margin: 0;
+}
+
+/* ── PROBLEM SECTION ── */
+.problem {
+  padding: 100px 0;
+}
+.label {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 16px;
+}
+.problem-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+  align-items: center; margin-top: 48px;
+}
+h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800; line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.problem-text p { color: var(--muted); margin-top: 16px; font-weight: 300; font-size: 17px; line-height: 1.7; }
+
+.pain-list { margin-top: 32px; display: flex; flex-direction: column; gap: 14px; }
+.pain-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px;
+}
+.pain-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: var(--red-dim);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.pain-item strong { display: block; font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+.pain-item span { font-size: 13px; color: var(--muted); }
+
+/* ── FEATURES ── */
+.features { padding: 100px 0; background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.features-header { text-align: center; margin-bottom: 56px; }
+.features-header p { color: var(--muted); margin-top: 12px; font-size: 17px; }
+
+.features-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+}
+.feat-card {
+  background: var(--bg2); padding: 28px;
+  transition: background 0.2s;
+}
+.feat-card:hover { background: var(--bg3); }
+.feat-icon {
+  width: 42px; height: 42px;
+  background: var(--red-dim); border: 1px solid rgba(255,45,45,0.2);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-bottom: 16px;
+}
+.feat-card h3 {
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+  margin-bottom: 6px;
+}
+.feat-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ── INSTALL STEPS ── */
+.install { padding: 100px 0; }
+.install-header { margin-bottom: 56px; }
+.install-header p { color: var(--muted); margin-top: 12px; max-width: 480px; }
+
+.steps { display: flex; flex-direction: column; gap: 0; position: relative; }
+.steps::before {
+  content: '';
+  position: absolute; left: 22px; top: 24px; bottom: 24px;
+  width: 1px; background: var(--border);
+}
+
+.step {
+  display: flex; gap: 24px; align-items: flex-start;
+  padding: 28px 0;
+  opacity: 0; transform: translateX(-20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.step.visible { opacity: 1; transform: translateX(0); }
+
+.step-num {
+  width: 44px; height: 44px; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14px;
+  color: var(--red); position: relative; z-index: 1;
+}
+.step-content { padding-top: 10px; }
+.step-content h3 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+.step-content p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+.step-content code {
+  display: inline-block;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 5px; padding: 2px 8px;
+  font-family: 'Courier New', monospace; font-size: 13px; color: var(--red);
+  margin-top: 6px;
+}
+
+.install-cta {
+  margin-top: 48px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  flex-wrap: wrap;
+}
+.install-cta-text h3 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+.install-cta-text p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+/* ── SUPPORT ── */
+.support {
+  padding: 80px 0;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.support h2 { margin-bottom: 12px; }
+.support p { color: var(--muted); max-width: 420px; margin: 0 auto 32px; font-size: 15px; }
+.btn-paypal {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--paypal); color: #fff;
+  padding: 14px 32px; border-radius: 8px;
+  font-size: 15px; font-weight: 500;
+  text-decoration: none; border: none; cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-paypal:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,48,135,0.4); }
+
+/* ── FOOTER ── */
+footer {
+  padding: 32px 0;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-left { display: flex; align-items: center; gap: 10px; }
+.footer-logo-icon {
+  width: 24px; height: 24px; background: var(--red); border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+}
+.footer-left span { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+footer p { font-size: 13px; color: var(--muted); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .problem-grid { grid-template-columns: 1fr; gap: 40px; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .install-cta { flex-direction: column; }
+  footer { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .features-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">
+        <svg width="14" height="12" viewBox="0 0 14 12" fill="none"><path d="M5 2l7 4-7 4V2Z" fill="#fff"/></svg>
+      </div>
+      YT Focus Mode
+    </a>
+    <button class="nav-dl" onclick="downloadExt()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v10M7 15l5 5 5-5"/><path d="M4 20h16"/></svg>
+      Download Free
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><span></span> Free Chrome Extension</div>
+  <h1>
+    YouTube.
+    <span class="accent">Without the trap.</span>
+  </h1>
+  <p class="hero-sub">
+    Kill the homepage rabbit hole, hide Shorts, mute the sidebar — and finally watch only what you actually came for.
+  </p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="downloadExt()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v10M7 15l5 5 5-5"/><path d="M4 20h16"/></svg>
+      Download Extension — Free
+    </button>
+    <a class="btn-secondary" href="#install">How to install ↓</a>
+  </div>
+  <p class="hero-note">Works on Chrome, Brave, Edge · No account needed · Open source</p>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="container">
+    <div class="label">The Problem</div>
+    <div class="problem-grid">
+      <div class="problem-text">
+        <h2>YouTube is designed to steal your time.</h2>
+        <p>Every pixel on YouTube's homepage is optimized by a billion-dollar algorithm to keep you watching — not what you want, but what they want you to watch.</p>
+        <p style="margin-top:12px;">You open it to watch one tutorial. Forty minutes later you're deep in a rabbit hole you never chose.</p>
+      </div>
+      <div class="pain-list">
+        <div class="pain-item">
+          <div class="pain-icon">🏠</div>
+          <div>
+            <strong>The homepage is a trap</strong>
+            <span>Endless algorithm-picked videos designed to hijack your next hour</span>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">⚡</div>
+          <div>
+            <strong>Shorts are a dopamine machine</strong>
+            <span>Infinite scroll, 30-second hits — engineered to be impossible to stop</span>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">📺</div>
+          <div>
+            <strong>The sidebar never lets you leave</strong>
+            <span>"Up next" autoplays before you even finish the video you chose</span>
+          </div>
+        </div>
+        <div class="pain-item">
+          <div class="pain-icon">💬</div>
+          <div>
+            <strong>Comments pull you in for hours</strong>
+            <span>Debates, drama, and replies that burn time you didn't plan to spend</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="container">
+    <div class="features-header">
+      <div class="label">The Solution</div>
+      <h2>One toggle. Full control.</h2>
+      <p>Block exactly what distracts you. Keep everything else.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🏠</div>
+        <h3>Clean Homepage</h3>
+        <p>Replaces the entire home feed with a minimal screen. Just the search bar — your intention, not the algorithm's.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📺</div>
+        <h3>No Sidebar Rabbit Hole</h3>
+        <p>Hides all recommended and "up next" videos while you watch. Finish what you came for.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h3>Shorts Gone</h3>
+        <p>Removes every Shorts shelf, button, and link across the entire site.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💬</div>
+        <h3>Hide Comments</h3>
+        <p>Toggle off the entire comments section so you stay focused on the content, not the discourse.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📢</div>
+        <h3>Ad Blocker Built In</h3>
+        <p>Skips skippable ads instantly, mutes overlays, and hides banners across the site.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔚</div>
+        <h3>End Cards Off</h3>
+        <p>No more clickbait thumbnails exploding over the last 20 seconds of every video.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">▶▶</div>
+        <h3>Autoplay Disabled</h3>
+        <p>Videos stop when they end. You choose what comes next — always.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔔</div>
+        <h3>Notifications Hidden</h3>
+        <p>The red bell is gone. No more anxiety-inducing notification counts.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚙️</div>
+        <h3>Toggle Everything</h3>
+        <p>One popup to flip any feature on or off. Pause Focus Mode entirely in one click.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL STEPS -->
+<section class="install" id="install">
+  <div class="container">
+    <div class="install-header">
+      <div class="label">Install in 60 seconds</div>
+      <h2>Four steps. No account. No BS.</h2>
+      <p>No Chrome Web Store. Load it directly — takes under a minute.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Download the extension</h3>
+          <p>Click the button below to download the <code>yt-focus-extension.zip</code> file to your computer.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Unzip the file</h3>
+          <p>Find the downloaded zip, right-click it and choose <strong>"Extract All"</strong> (Windows) or just double-click (Mac). You'll get a folder called <code>yt-focus-extension</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Open Chrome Extensions</h3>
+          <p>In Chrome, go to <code>chrome://extensions</code> — or open the menu → More Tools → Extensions. Turn on <strong>Developer mode</strong> using the toggle in the top-right corner.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Load the extension</h3>
+          <p>Click <strong>"Load unpacked"</strong> and select the <code>yt-focus-extension</code> folder you unzipped. Done — the icon appears in your toolbar instantly.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3>Go to YouTube and enjoy the silence</h3>
+          <p>Open <code>youtube.com</code> — your homepage will be replaced with a clean focus screen. Click the extension icon anytime to toggle features on or off.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="install-cta">
+      <div class="install-cta-text">
+        <h3>Ready to focus?</h3>
+        <p>Free forever. No login. No tracking. Just YouTube the way you want it.</p>
+      </div>
+      <button class="btn-primary" onclick="downloadExt()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v10M7 15l5 5 5-5"/><path d="M4 20h16"/></svg>
+        Download — yt-focus-extension.zip
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPORT -->
+<section class="support">
+  <div class="container">
+    <div class="label">Support</div>
+    <h2>Built with ☕ — kept free</h2>
+    <p>This extension is 100% free and always will be. If it saves you hours of distraction, consider buying me a coffee.</p>
+    <a class="btn-paypal" href="https://www.paypal.com/donate" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M7 11C7 7.5 9.5 5 13.5 5H16C18.5 5 20 6.5 20 8.5C20 11.5 17.5 13 15 13H13L12 18H9L7 11Z"/>
+        <path d="M4 13C4 9.5 6.5 7 10.5 7"/>
+      </svg>
+      Donate via PayPal
+    </a>
+    <p style="margin-top:16px; font-size:12px; color:#333;">Completely optional — the extension stays free either way.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="container">
+  <footer>
+    <div class="footer-left">
+      <div class="footer-logo-icon">
+        <svg width="10" height="9" viewBox="0 0 14 12" fill="none"><path d="M5 2l7 4-7 4V2Z" fill="#fff"/></svg>
+      </div>
+      <span>YT Focus Mode</span>
+    </div>
+    <p>Free Chrome extension · No account · No tracking</p>
+  </footer>
+</div>
+
+<script>
+function downloadExt() {
+  const a = document.createElement('a');
+  a.href = 'yt-focus-extension.zip';
+  a.download = 'yt-focus-extension.zip';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// Scroll animation for steps
+const steps = document.querySelectorAll('.step');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 100);
+    }
+  });
+}, { threshold: 0.2 });
+steps.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
