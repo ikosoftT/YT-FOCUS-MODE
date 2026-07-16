@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YT Focus Mode</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 300px;
+      font-family: "YouTube Sans", -apple-system, Roboto, sans-serif;
+      background: #0f0f0f;
+      color: #f1f1f1;
+      padding-bottom: 12px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid #272727;
+    }
+
+    .logo {
+      width: 32px;
+      height: 32px;
+      background: #ff0000;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo svg { display: block; }
+
+    .title-block h1 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f1f1f1;
+      line-height: 1.2;
+    }
+
+    .title-block p {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 1px;
+    }
+
+    /* Master toggle */
+    .master {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #1a1a1a;
+      border-bottom: 1px solid #272727;
+    }
+
+    .master-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f1f1;
+    }
+
+    .master-sub {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    /* Section title */
+    .section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #717171;
+      padding: 14px 16px 6px;
+    }
+
+    /* Toggle rows */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 16px;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+
+    .toggle-row:hover { background: #1a1a1a; }
+
+    .toggle-info { flex: 1; }
+
+    .toggle-label {
+      font-size: 13px;
+      color: #f1f1f1;
+    }
+
+    .toggle-desc {
+      font-size: 11px;
+      color: #717171;
+      margin-top: 1px;
+    }
+
+    /* Toggle switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #3d3d3d;
+      border-radius: 20px;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .switch input:checked + .slider { background: #ff0000; }
+    .switch input:checked + .slider::before { transform: translateX(16px); }
+
+    /* Disabled state when master is off */
+    body.disabled .toggle-row:not(.master) { opacity: 0.4; pointer-events: none; }
+
+    /* PayPal button */
+    #paypal-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 9px 14px;
+      background: #003087;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+      justify-content: center;
+      letter-spacing: 0.01em;
+    }
+    #paypal-btn:hover { background: #0050b3; transform: translateY(-1px); }
+    #paypal-btn:active { transform: translateY(0); }
+
+    /* Footer */
+    .footer {
+      margin: 12px 16px 0;
+      padding-top: 12px;
+      border-top: 1px solid #272727;
+      font-size: 11px;
+      color: #555;
+      text-align: center;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ff4444;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .status-dot.on { background: #2ba640; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+        <path d="M7 3L14 7L7 11V3Z" fill="white"/>
+        <path d="M1 1L4 7L1 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="title-block">
+      <h1>YT Focus Mode [1337]</h1>
+      <p>Your distraction-free YouTube</p>
+    </div>
+  </div>
+
+  <!-- Master toggle -->
+  <div class="master toggle-row">
+    <div>
+      <div class="master-label">Focus Mode</div>
+      <div class="master-sub">Enable / disable all blocking</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="enabled" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <!-- Blocks section -->
+  <div class="section-title">What to hide</div>
+
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <div class="toggle-label">🏠 Home feed</div>
+      <div class="toggle-desc">Replaces homepage with a clean screen</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="blockHome" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <div class="toggle-label">📺 Watch sidebar</div>
+      <div class="toggle-desc">Hides recommended videos while watching</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="blockSidebar" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <div class="toggle-label">⚡ Shorts</div>
+      <div class="toggle-desc">Removes all Shorts content everywhere</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="blockShorts" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <div class="toggle-label">🔚 End cards</div>
+      <div class="toggle-desc">Hides cards and suggested videos at end</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="blockEndCards" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <div class="toggle-label">▶▶ Autoplay</div>
+      <div class="toggle-desc">Disables auto-playing the next video</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="blockAutoplay" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <div class="toggle-label">📢 Ads</div>
+      <div class="toggle-desc">Skips and hides all ad formats</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="blockAds" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <div class="toggle-label">🔔 Notifications bell</div>
+      <div class="toggle-desc">Hides the notification button</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="blockNotifications" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <div class="toggle-info">
+      <div class="toggle-label">💬 Comments</div>
+      <div class="toggle-desc">Hides the comments section on videos</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="blockComments">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <!-- Support -->
+  <div class="section-title">Support the project</div>
+  <div style="padding: 6px 16px 4px;">
+    <a id="paypal-btn" href="paypal.me/Yassineikosoft" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M7 11C7 7.5 9.5 5 13.5 5H16C18.5 5 20 6.5 20 8.5C20 11.5 17.5 13 15 13H13L12 18H9L7 11Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M4 13C4 9.5 6.5 7 10.5 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      Donate via PayPal ☕
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span class="status-dot" id="status-dot"></span>
+    <span id="status-text">Loading…</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
